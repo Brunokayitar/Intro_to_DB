@@ -65,12 +65,11 @@ try:
 
         print("Database 'alx_book_store' and all tables created successfully!")
 
-except Error as e:
+except mysql.connector.Error as e:
     print(f"Error: {e}")
 
 finally:
     if 'cursor' in locals() and cursor:
         cursor.close()
     if 'connection' in locals() and connection.is_connected():
-     connection.close()
-    
+        connection.close()
