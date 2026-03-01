@@ -1,27 +1,76 @@
-# MySQLServer.py
+
 
 import mysql.connector
 from mysql.connector import Error
 
 try:
-    # Connect to MySQL server
+    
     connection = mysql.connector.connect(
         host="localhost",
         user="root",
-        password=""  # Replace with your MySQL password if you have one
+        password=""  # replace with your MySQL password if needed
     )
 
     if connection.is_connected():
         cursor = connection.cursor()
-        # This line must exactly match the checker's expected string
-        cursor.execute("CREATE DATABASE IF NOT EXISTS alxbookstore")
-        print("Database 'alxbookstore' created successfully!")
+        cursor.execute("CREATE DATABASE IF NOT EXISTS alx_book_store")
+        cursor.execute("USE alx_book_store")
+
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS Authors (
+            author_id INT AUTO_INCREMENT PRIMARY KEY,
+            author_name VARCHAR(215) NOT NULL
+        )
+        """)
+
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS Books (
+            book_id INT AUTO_INCREMENT PRIMARY KEY,
+            title VARCHAR(130) NOT NULL,
+            author_id INT NOT NULL,
+            price DOUBLE NOT NULL,
+            publication_date DATE,
+            FOREIGN KEY (author_id) REFERENCES Authors(author_id)
+        )
+        """)
+
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS Customers (
+            customer_id INT AUTO_INCREMENT PRIMARY KEY,
+            customer_name VARCHAR(215) NOT NULL,
+            email VARCHAR(215) NOT NULL,
+            address TEXT
+        )
+        """)
+
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS Orders (
+            order_id INT AUTO_INCREMENT PRIMARY KEY,
+            customer_id INT NOT NULL,
+            order_date DATE,
+            FOREIGN KEY (customer_id) REFERENCES Customers(customer_id)
+        )
+        """)
+
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS Order_Details (
+            orderdetailid INT AUTO_INCREMENT PRIMARY KEY,
+            order_id INT NOT NULL,
+            book_id INT NOT NULL,
+            quantity DOUBLE NOT NULL,
+            FOREIGN KEY (order_id) REFERENCES Orders(order_id),
+            FOREIGN KEY (book_id) REFERENCES Books(book_id)
+        )
+        """)
+
+        print("Database 'alx_book_store' and all tables created successfully!")
 
 except Error as e:
-    print(f"Error while connecting to MySQL: {e}")
+    print(f"Error: {e}")
 
 finally:
-    if 'connection' in locals() and connection.is_connected():
+    if 'cursor' in locals() and cursor:
         cursor.close()
-        connection.close()
-        print("MySQL connection is closed")
+    if 'connection' in locals() and connection.is_connected():
+     connection.close()
+    
